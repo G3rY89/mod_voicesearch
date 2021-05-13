@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="3.1.0" client="site" method="upgrade">
+    <name>Voice search</name>
+    <author>Gergely Kudó</author>
+    <version>0.0.4</version>
+    <description>Voice search for Joomla.</description>
+
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/mysql/install.mysql.utf8.sql</file>
+        </sql>
+    </install>
+
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/mysql/uninstall.mysql.utf8.sql</file>
+        </sql>
+    </uninstall>
+
+    <files>
+        <filename module="mod_voicesearch">mod_voicesearch.php</filename>
+        <filename>tts.php</filename>
+        <filename>helper.php</filename>
+        <filename>tmpl/default.php</filename>
+        <filename>media/images/allie.png</filename>
+        <filename>media/sound/ok.wav</filename>
+        <filename>media/sound/error.wav</filename>
+        <folder>sql</folder>
+    </files>
+    
+</extension>
