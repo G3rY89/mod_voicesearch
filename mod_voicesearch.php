@@ -30,12 +30,14 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
 
     var dbLang = recognition.lang.contains('hu') ? 'hu' : 'en';
 
+    getVoicesearchStatusFromSession();
+
     function start(){
-        getLangFromDB(dbLang);
+        getLangFromDB(dbLang, false);
     }
 
-    function startRecognition(){
-        var activated = false;
+    function startRecognition(activated){
+        var activated = activated;
         recognition.start();
 
         recognition.onend = function(){
@@ -162,6 +164,7 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
             } else if(result.includes(langObject.start)){
                 recognition.stop();
                 setToRed();
+                setVoicesearchStatusToSession(true);
                 showTooltipText(langObject.greeting);
                 getTTS(function(recognition){
                     setToGreen();
@@ -189,7 +192,7 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
         });
     }
 
-    function getLangFromDB(lang){   
+    function getLangFromDB(lang, activated){   
        var request = jQuery.ajax({
             url: 'index.php?option=com_ajax&module=voicesearch&method=getDBData&format=json',
             type: "post",
@@ -198,7 +201,30 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
         });
         request.done(function(res){
             langObject = res.data[0];
-            startRecognition();
+            startRecognition(activated);
+        })
+    }
+
+    function setVoicesearchStatusToSession(status){
+        var request = jQuery.ajax({
+            url: 'index.php?option=com_ajax&module=voicesearch&method=setVoicesearchStatusToSession&format=json',
+            type: "post",
+            async: false,
+            data:{status:status}
+        });
+    }
+
+    function getVoicesearchStatusFromSession(){
+        var request = jQuery.ajax({
+            url: 'index.php?option=com_ajax&module=voicesearch&method=getVoicesearchStatusFromSession&format=json',
+            type: "post",
+            async: false,
+        });
+        request.done(function(res){
+            if(res.data == "true"){
+                getLangFromDB(dbLang, true);
+                setToGreen();
+            }
         })
     }
 

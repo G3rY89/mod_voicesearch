@@ -45,4 +45,14 @@ class ModVoiceSearchHelper
 
         return $voice['response'];
     }
+
+    public static function setVoicesearchStatusToSessionAjax(){
+        $session = JFactory::getSession();
+        $session->set('voicesearchstatus', $_POST["status"]);
+    }
+
+    public static function getVoicesearchStatusFromSessionAjax(){
+        $session = JFactory::getSession();
+        return $session->get('voicesearchstatus');
+    }
 }
