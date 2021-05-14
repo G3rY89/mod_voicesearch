@@ -14,14 +14,13 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
 
 <script type="text/javascript">
 
-    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-    var langObject = null;
+    var voiceSearch = new Voicesearch();
+    voiceSearch.start();
 
-    var recognition = new SpeechRecognition();
-    var speechRecognitionList = new SpeechGrammarList();
-    var userLang = navigator.language || navigator.userLanguage; 
+    /* function getFeaturedResults(){
+        $featuredResults = new Array();
 
+<<<<<<< Updated upstream
     recognition.grammars = speechRecognitionList;
     recognition.continuous = true;
     recognition.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
@@ -215,56 +214,28 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
         request.done(function(res){
             play(res.data).then(function(){
                 reaction(recognition);
+=======
+        $results = jQuery("#results-container");
+        if($results != null){
+            $results.each(function(i){
+                if(~jQuery($results[i]).attr('class').indexOf('featured')){
+                    $featuredResults.add(jQuery($results[i]));
+                }
+>>>>>>> Stashed changes
             });
-        })
+        }
+        return $featuredResults;
     }
 
-    var voiceSearchImage = document.getElementById('voicesearch');
-
-    var setToBlue =  function () {
-        jQuery('#voicesearch').css({"-webkit-animation": "glowingBlue 2000ms infinite",
-            "-moz-animation": "glowingBlue 2000ms infinite",
-            "-o-animation": "glowingBlue 2000ms infinite"})
-    }       
-
-    var setToRed = function() {
-        jQuery('#voicesearch').css({"-webkit-animation": "glowingRed 2000ms infinite",
-            "-moz-animation": "glowingRed 2000ms infinite",
-            "-o-animation": "glowingRed 2000ms infinite"})
-    };
-
-    var setToGreen = function() {
-        jQuery('#voicesearch').css({"-webkit-animation": "glowingGreen 2000ms infinite",
-            "-moz-animation": "glowingGreen 2000ms infinite",
-            "-o-animation": "glowingGreen 2000ms infinite"})
-    };
-
-    var setToOff = function() {
-        jQuery('#voicesearch').css({"-webkit-animation": "",
-        "-moz-animation": "",
-        "-o-animation": ""})
-    };
-
-    function play(url) {
-        return new Promise(function(resolve, reject) {
-            var audio = new Audio();
-            audio.preload = "auto";
-            audio.autoplay = true;
-            audio.onerror = reject;
-            audio.onended = resolve;
-            audio.src = url
-        });
-    }
-
-    jQuery(document).ready(function(){
-        var $voiceSearchButton = jQuery("#voicesearch");
-
-        showTooltipText("Hangvezérlés aktiválásához kattints ide!");
-        setTimeout(function(){
-            hideTooltipText()
-        }, 3000);
-
-    })
+    function getFeaturedResultsCompanyName($featuredResults){
+        $companyNames = [];
+        if($featuredResults != null){
+            $featuredResults.each(function(i){
+                $companyNames.push(jQuery('span[itemprop="name"]').text);
+            })
+        }
+        return $companyNames;
+    } */
     
 </script>
 
