@@ -6,16 +6,17 @@ class JoomlaHelper {
         this.playbackHandler = new PlaybackHandler();
     }
 
-    getLangFromDB(lang){   
-        var request = jQuery.ajax({
-            url: 'index.php?option=com_ajax&module=voicesearch&method=getDBData&format=json',
-            type: "post",
-            async: false,
-            data:{lang:lang}
-        });
-        request.done(function(response){
-            return response;
-        })
+    getLangFromDB(lang){
+        return new Promise(function(resolve, reject){
+            var request = jQuery.ajax({
+                url: 'index.php?option=com_ajax&module=voicesearch&method=getDBData&format=json',
+                type: "post",
+                data:{lang:lang}
+            });
+            request.success(function(response){
+                resolve(response);
+            })
+        })   
     }
  
     setVoicesearchStatusToSession(status){

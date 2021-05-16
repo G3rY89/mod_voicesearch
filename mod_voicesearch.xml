@@ -23,7 +23,7 @@
         <filename>helper.php</filename>
         <filename>tmpl/default.php</filename>
         <filename>media/images/allie.png</filename>
-        <folder>js</folder>
+        <folder>assets</folder>
         <folder>sql</folder>
     </files>
     
