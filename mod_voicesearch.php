@@ -14,6 +14,7 @@ $document->addScript('modules/mod_voicesearch/assets/js/JoomlaHelper.js');
 $document->addScript('modules/mod_voicesearch/assets/js/PlaybackHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/TooltipHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/FlashingHandler.js');
+$document->addScript('modules/mod_voicesearch/assets/js/ResultReader.js');
 
 JHtml::_('stylesheet', 'modules/mod_voicesearch/assets/style.css');
 
@@ -25,29 +26,5 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
 
     var voiceSearch = new Voicesearch();
     voiceSearch.start();
-
-    /* function getFeaturedResults(){
-        $featuredResults = new Array();
-
-        $results = jQuery("#results-container");
-        if($results != null){
-            $results.each(function(i){
-                if(~jQuery($results[i]).attr('class').indexOf('featured')){
-                    $featuredResults.add(jQuery($results[i]));
-                }
-            });
-        }
-        return $featuredResults;
-    }
-
-    function getFeaturedResultsCompanyName($featuredResults){
-        $companyNames = [];
-        if($featuredResults != null){
-            $featuredResults.each(function(i){
-                $companyNames.push(jQuery('span[itemprop="name"]').text);
-            })
-        }
-        return $companyNames;
-    } */
     
 </script>

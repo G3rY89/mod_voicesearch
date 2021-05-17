@@ -1,6 +1,6 @@
 class JoomlaHelper {
 
-    static playbackHandler;
+    playbackHandler;
 
     constructor(){
         this.playbackHandler = new PlaybackHandler();
@@ -29,19 +29,20 @@ class JoomlaHelper {
     }
  
     getVoicesearchStatusFromSession(){
-        var request = jQuery.ajax({
-            url: 'index.php?option=com_ajax&module=voicesearch&method=getVoicesearchStatusFromSession&format=json',
-            type: "post",
-            async: false,
-        });
-        request.done(function(res){
-            if(res.data == "true"){
-                return res.data;
-            }
+        return new Promise(function(resolve, reject){
+            var request = jQuery.ajax({
+                url: 'index.php?option=com_ajax&module=voicesearch&method=getVoicesearchStatusFromSession&format=json',
+                type: "post"
+            });
+            request.success(function(response){
+                resolve(response);
+            })
         })
     }
  
-    getTTS(reaction, recognition, TTS){
+    getTTS(reaction, recognition, TTS, langObject){
+        var that = this;
+
         var request = jQuery.ajax({
             url: 'index.php?option=com_ajax&module=voicesearch&method=getVoiceFromAPI&format=json',
             type: "post",
@@ -51,10 +52,10 @@ class JoomlaHelper {
                 Langobject:langObject
             }
         });
-        request.done(function(res){
-            this.playbackHandler.play(res.data).then(function(){
+        request.success(function(response){
+            that.playbackHandler.play(response.data).then(function(){
                 reaction(recognition);
             });
-        })
+        }) 
     }
 }

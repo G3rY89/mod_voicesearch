@@ -25,20 +25,23 @@ class Voicesearch {
     start(){
         var that = this;
 
-        this.joomlaHelper.getLangFromDB(this.dbLang).then(function(data){
-            that.langObject = data.data[0];
+        this.joomlaHelper.getLangFromDB(this.dbLang).then(function(response){
+            that.langObject = response.data[0];
         });
 
-        if(that.joomlaHelper.getVoicesearchStatusFromSession()){
-            that.startRecognition(true);
-            that.flashingHandler.setToGreen();
-        } else {
-            that.tooltipHandler.showTooltipText("Hangvezérlés aktiválásához kattints ide!");
-            setTimeout(function(){
-                that.tooltipHandler.hideTooltipText();
-            }, 3000);
-            that.startRecognition(false);
-        }
+        this.joomlaHelper.getVoicesearchStatusFromSession().then(function(response){
+            if(response.data == "true" ){
+                that.startRecognition(true);
+                that.flashingHandler.setToGreen();
+            } else {
+                that.tooltipHandler.showTooltipText("Hangvezérlés aktiválásához kattints ide!");
+                setTimeout(function(){
+                    that.tooltipHandler.hideTooltipText();
+                }, 3000);
+                that.startRecognition(false);
+            }
+        })
+
     }
 
     startRecognition(activated){
@@ -71,14 +74,14 @@ class Voicesearch {
                         that.tooltipHandler.hideTooltipText();
                         that.recognition.start();
                         that.flashingHandler.setToGreen();
-                    }, that.recognition, that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""))
+                    }, that.recognition, that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""), that.langObject)
                 } else if(result.includes(that.langObject.category)){
                     var resultFounded = false;
                     that.recognition.stop();
                     that.tooltipHandler.showTooltipText(that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""));
                     that.flashingHandler.setToRed();
                     that.joomlaHelper.getTTS(function(){
-                        $options = jQuery("#categories option");
+                        var $options = jQuery("#categories option");
                         $options.each(function(i){
                             if($options[i].text.toLowerCase().indexOf(result.toLowerCase().replace(that.langObject.category + " ", "")) >= 0){
                                 jQuery($options[i]).prop('selected',true);
@@ -94,13 +97,13 @@ class Voicesearch {
                                 that.tooltipHandler.hideTooltipText();
                                 that.recognition.start();
                                 that.flashingHandler.setToGreen();
-                            }, that.recognition, that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""));
+                            }, that.recognition, that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject);
                         } else {
                             that.tooltipHandler.hideTooltipText();
                             that.recognition.start();
                             that.flashingHandler.setToGreen();
                         }
-                    }, that.recognition, that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", "")); 
+                    }, that.recognition, that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject); 
                 
                 } else if(result.includes(that.langObject.zip)){
                     that.recognition.stop();
@@ -112,14 +115,14 @@ class Voicesearch {
                         that.tooltipHandler.hideTooltipText();
                         that.recognition.start();
                         that.flashingHandler.setToGreen();
-                    }, that.recognition, that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""));
+                    }, that.recognition, that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""), that.langObject);
                 } else if(result.toLowerCase().includes(that.langObject.city)){
                     var resultFounded = false;
                     that.recognition.stop();
                     that.tooltipHandler.showTooltipText(that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""));
                     that.flashingHandler.setToRed();
                     that.joomlaHelper.getTTS(function(){
-                        $cities = jQuery("#citySearch option");
+                        var $cities = jQuery("#citySearch option");
                         $cities.each(function(i){
                             if($cities[i].text.indexOf(result.replace(that.langObject.city + " ", "")) >= 0){
                                 jQuery($cities[i]).prop('selected',true);
@@ -135,13 +138,13 @@ class Voicesearch {
                                 that.tooltipHandler.hideTooltipText();
                                 that.recognition.start();
                                 that.flashingHandler.setToGreen();
-                            }, that.recognition, that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""));
+                            }, that.recognition, that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""), that.langObject);
                         } else {
                             that.tooltipHandler.hideTooltipText();
                             that.recognition.start();
                             that.flashingHandler.setToGreen();
                         }
-                    }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""));
+                    }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""), that.langObject);
                 } else if(result.includes(that.langObject.search)){
                     document.getElementById("keywordSearch").submit();
                 } else if(result.includes(that.langObject.stop)) {
@@ -153,13 +156,13 @@ class Voicesearch {
                     window.scrollBy(0, -window.innerHeight);
                 } else {
                     that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(langObject.error + result);
+                    that.tooltipHandler.showTooltipText(that.langObject.error + result);
                     that.flashingHandler.setToRed()
                     that.joomlaHelper.getTTS(function(){
                         that.recognition.start();
                         that.flashingHandler.setToGreen();
                         that.tooltipHandler.hideTooltipText();
-                    }, that.recognition, that.langObject.error + result);
+                    }, that.recognition, that.langObject.error + result, that.langObject);
                 }
             }
             if(result.includes(that.langObject.stop)){ 
@@ -168,7 +171,7 @@ class Voicesearch {
                 that.joomlaHelper.getTTS(function(){
                     that.flashingHandler.setToOff();
                     that.tooltipHandler.hideTooltipText();
-                }, that.recognition, that.langObject.goodbye);
+                }, that.recognition, that.langObject.goodbye, that.langObject);
             } else if(result.includes(that.langObject.start)){
                 that.recognition.stop();
                 that.flashingHandler.setToRed();
@@ -179,7 +182,7 @@ class Voicesearch {
                     that.tooltipHandler.hideTooltipText();
                     that.recognition.start();
                     activated = true;
-                }, that.recognition, that.langObject.greeting);
+                }, that.recognition, that.langObject.greeting, that.langObject);
             }
         }
     }
