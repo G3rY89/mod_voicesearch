@@ -23,8 +23,7 @@
         <filename>helper.php</filename>
         <filename>tmpl/default.php</filename>
         <filename>media/images/allie.png</filename>
-        <filename>media/sound/ok.wav</filename>
-        <filename>media/sound/error.wav</filename>
+        <folder>assets</folder>
         <folder>sql</folder>
     </files>
     

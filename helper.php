@@ -6,7 +6,7 @@ class ModVoiceSearchHelper
     public static function getVoiceSearch($params)
     {
         JHtml::_('jquery.framework', false);
-        return '<div class="tooltip1"><span class="tooltiptext1"></span><input class="allie-logo" type="image" onclick="start()" src="modules/mod_voicesearch/media/images/allie.png" border="0" id="voicesearch" name="voicesearch"/></div>';
+        return '<div class="tooltip1"><span class="tooltiptext1"></span><input class="allie-logo" type="image" onclick="voiceSearch.start()" src="modules/mod_voicesearch/media/images/allie.png" border="0" id="voicesearch" name="voicesearch"/></div>';
     }
 
     public static function getDBDataAjax(){
