@@ -14,11 +14,12 @@ CREATE TABLE IF NOT EXISTS `#__voicesearch` (
 	`no_result` varchar(255) NOT NULL,
 	`scroll_down` varchar(255) NOT NULL,
 	`scroll_up` varchar(255) NOT NULL,
+	`featured_results` varchar(255) NOT NULL,
 	`tts_voice` varchar(255) NOT NULL,
 	`lang` varchar(255) NOT NULL,
 
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
-INSERT INTO `#__voicesearch` (`searchkeyword`, `category`, `zip`, `city`, `search`, `start`, `stop`, `greeting`, `goodbye`, `error`, `sorry`, `no_result`, `scroll_down`, `scroll_up`, `tts_voice`, `lang`) VALUES ('kulcsszó', 'kategória', 'irányítószám', 'település', 'keresés', 'szia', 'viszlát', 'Szia, miben segíthetek?', 'Viszlát!', 'Sajnálom, nem értettem azt, hogy: ', 'Sajnálom, a ', ' keresőben nincsen találat arra, hogy: ', 'görgess le', 'görgess fel', 'Mate', 'hu');
-INSERT INTO `#__voicesearch` (`searchkeyword`, `category`, `zip`, `city`, `search`, `start`, `stop`, `greeting`, `goodbye`, `error`, `sorry`, `no_result`, `scroll_down`, `scroll_up`,`tts_voice`, `lang`) VALUES ('expression', 'category', 'zip code', 'city', 'search', 'hello', 'bye', 'Hi, how can I help you?', 'Goodbye!', 'Sorry, I do not understand: ', 'Sorry, the ', ' searchfield does not have result for: ', 'scroll down', 'scroll up', 'Mary', 'en');
+INSERT INTO `#__voicesearch` (`searchkeyword`, `category`, `zip`, `city`, `search`, `start`, `stop`, `greeting`, `goodbye`, `error`, `sorry`, `no_result`, `scroll_down`, `scroll_up`, `featured_results`, `tts_voice`, `lang`) VALUES ('kulcsszó', 'kategória', 'irányítószám', 'település', 'keresés', 'szia', 'viszlát', 'Szia, miben segíthetek?', 'Viszlát!', 'Sajnálom, nem értettem azt, hogy: ', 'Sajnálom, a ', ' keresőben nincsen találat arra, hogy: ', 'görgess le', 'görgess fel', 'Legnépszerűbb találatok: ', 'Mate', 'hu');
+INSERT INTO `#__voicesearch` (`searchkeyword`, `category`, `zip`, `city`, `search`, `start`, `stop`, `greeting`, `goodbye`, `error`, `sorry`, `no_result`, `scroll_down`, `scroll_up`, `featured_results`,`tts_voice`, `lang`) VALUES ('expression', 'category', 'zip code', 'city', 'search', 'hello', 'bye', 'Hi, how can I help you?', 'Goodbye!', 'Sorry, I do not understand: ', 'Sorry, the ', ' searchfield does not have result for: ', 'scroll down', 'scroll up', 'Featured results: ', 'Mary', 'en');

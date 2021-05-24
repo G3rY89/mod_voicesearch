@@ -8,6 +8,7 @@ class Voicesearch {
     joomlaHelper;
     flashingHandler;
     playbackHandler;
+    resultHandler;
 
     constructor(){
         this.recognition.grammars = new webkitSpeechGrammarList();
@@ -20,19 +21,30 @@ class Voicesearch {
         this.tooltipHandler = new TooltipHandler();
         this.joomlaHelper = new JoomlaHelper();
         this.flashingHandler = new FlashingHandler();
+
+        this.emptySessionStorage();
     };
 
     start(){
         var that = this;
 
+        var voiceSearchStatus = sessionStorage.getItem('voicesearchstatus');
+        var readResults = sessionStorage.getItem('readresults');
+
         this.joomlaHelper.getLangFromDB(this.dbLang).then(function(response){
             that.langObject = response.data[0];
-        });
-
-        this.joomlaHelper.getVoicesearchStatusFromSession().then(function(response){
-            if(response.data == "true" ){
-                that.startRecognition(true);
-                that.flashingHandler.setToGreen();
+            if(voiceSearchStatus == "true") {
+                if(readResults == "true"){
+                    that.flashingHandler.setToBlue();
+                    that.resultHandler = new ResultHandler();
+                    that.joomlaHelper.getTTS(function(){
+                        that.startRecognition(true);
+                        that.flashingHandler.setToGreen();
+                    }, that.recognition, that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames(), that.langObject)
+                } else {
+                    that.flashingHandler.setToGreen();
+                    that.startRecognition(true);
+                }
             } else {
                 that.tooltipHandler.showTooltipText("Hangvezérlés aktiválásához kattints ide!");
                 setTimeout(function(){
@@ -40,8 +52,7 @@ class Voicesearch {
                 }, 3000);
                 that.startRecognition(false);
             }
-        })
-
+        });
     }
 
     startRecognition(activated){
@@ -146,10 +157,17 @@ class Voicesearch {
                         }
                     }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""), that.langObject);
                 } else if(result.includes(that.langObject.search)){
+                    sessionStorage.setItem('readresults', true);
                     document.getElementById("keywordSearch").submit();
                 } else if(result.includes(that.langObject.stop)) {
-                    that. recognition.stop();
-                    that.flashingHandler.setToOff();
+                    that.recognition.stop();
+                    that.tooltipHandler.showTooltipText(that.langObject.goodbye);
+                    sessionStorage.setItem('voicesearchstatus', false);
+                    sessionStorage.setItem('readresults', false);
+                    that.joomlaHelper.getTTS(function(){
+                        that.flashingHandler.setToOff();
+                        that.tooltipHandler.hideTooltipText();
+                    }, that.recognition, that.langObject.goodbye, that.langObject);
                 } else if(result.includes(that.langObject.scroll_down)){
                     window.scrollBy(0, window.innerHeight);
                 } else if(result.includes(that.langObject.scroll_up)){
@@ -164,26 +182,35 @@ class Voicesearch {
                         that.tooltipHandler.hideTooltipText();
                     }, that.recognition, that.langObject.error + result, that.langObject);
                 }
+            } else {
+                if(result.includes(that.langObject.stop)){ 
+                    that.recognition.stop();
+                    that.tooltipHandler.showTooltipText(that.langObject.goodbye);
+                    sessionStorage.setItem('voicesearchstatus', false);
+                    sessionStorage.setItem('readresults', false);
+                    that.joomlaHelper.getTTS(function(){
+                        that.flashingHandler.setToOff();
+                        that.tooltipHandler.hideTooltipText();
+                    }, that.recognition, that.langObject.goodbye, that.langObject);
+                } else if(result.includes(that.langObject.start)){
+                    that.recognition.stop();
+                    that.flashingHandler.setToRed();
+                    sessionStorage.setItem('voicesearchstatus', true);
+                    that.tooltipHandler.showTooltipText(that.langObject.greeting);
+                    that.joomlaHelper.getTTS(function(){
+                        that.flashingHandler.setToGreen();
+                        that.tooltipHandler.hideTooltipText();
+                        that.recognition.start();
+                        activated = true;
+                    }, that.recognition, that.langObject.greeting, that.langObject);
+                }
             }
-            if(result.includes(that.langObject.stop)){ 
-                that.recognition.stop();
-                that.tooltipHandler.showTooltipText(that.langObject.goodbye);
-                that.joomlaHelper.getTTS(function(){
-                    that.flashingHandler.setToOff();
-                    that.tooltipHandler.hideTooltipText();
-                }, that.recognition, that.langObject.goodbye, that.langObject);
-            } else if(result.includes(that.langObject.start)){
-                that.recognition.stop();
-                that.flashingHandler.setToRed();
-                that.joomlaHelper.setVoicesearchStatusToSession(true);
-                that.tooltipHandler.showTooltipText(that.langObject.greeting);
-                that.joomlaHelper.getTTS(function(){
-                    that.flashingHandler.setToGreen();
-                    that.tooltipHandler.hideTooltipText();
-                    that.recognition.start();
-                    activated = true;
-                }, that.recognition, that.langObject.greeting, that.langObject);
-            }
+        }
+    }
+
+    emptySessionStorage() {
+        if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+            sessionStorage.clear();
         }
     }
 }

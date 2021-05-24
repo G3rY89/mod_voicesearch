@@ -15,7 +15,7 @@ class ModVoiceSearchHelper
         $db = JFactory::getDbo();
 
         $query = $db->getQuery(true)
-                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'tts_voice', 'lang')))
+                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'featured_results', 'tts_voice', 'lang')))
                     ->from($db->quoteName('#__voicesearch'))
                     ->where($db->quoteName('lang') .' LIKE ' . $db->quote('%' . $lang . '%'));
                     
@@ -44,15 +44,5 @@ class ModVoiceSearchHelper
         ]);
 
         return $voice['response'];
-    }
-
-    public static function setVoicesearchStatusToSessionAjax(){
-        $session = JFactory::getSession();
-        $session->set('voicesearchstatus', $_POST["status"]);
-    }
-
-    public static function getVoicesearchStatusFromSessionAjax(){
-        $session = JFactory::getSession();
-        return $session->get('voicesearchstatus');
     }
 }

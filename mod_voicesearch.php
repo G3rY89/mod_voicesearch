@@ -14,7 +14,7 @@ $document->addScript('modules/mod_voicesearch/assets/js/JoomlaHelper.js');
 $document->addScript('modules/mod_voicesearch/assets/js/PlaybackHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/TooltipHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/FlashingHandler.js');
-$document->addScript('modules/mod_voicesearch/assets/js/ResultReader.js');
+$document->addScript('modules/mod_voicesearch/assets/js/ResultHandler.js');
 
 JHtml::_('stylesheet', 'modules/mod_voicesearch/assets/style.css');
 
