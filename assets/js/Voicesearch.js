@@ -9,6 +9,8 @@ class Voicesearch {
     flashingHandler;
     playbackHandler;
     resultHandler;
+    voiceSearchStatus;
+    readResults;
 
     constructor(){
         this.recognition.grammars = new webkitSpeechGrammarList();
@@ -28,13 +30,13 @@ class Voicesearch {
     start(){
         var that = this;
 
-        var voiceSearchStatus = sessionStorage.getItem('voicesearchstatus');
-        var readResults = sessionStorage.getItem('readresults');
+        that.voiceSearchStatus = sessionStorage.getItem('voicesearchstatus');
+        that.readResults = sessionStorage.getItem('readresults');
 
         this.joomlaHelper.getLangFromDB(this.dbLang).then(function(response){
             that.langObject = response.data[0];
-            if(voiceSearchStatus == "true") {
-                if(readResults == "true"){
+            if(that.voiceSearchStatus == "true") {
+                if(that.readResults == "true"){
                     that.flashingHandler.setToBlue();
                     that.resultHandler = new ResultHandler();
                     that.joomlaHelper.getTTS(function(){
@@ -168,6 +170,17 @@ class Voicesearch {
                         that.flashingHandler.setToOff();
                         that.tooltipHandler.hideTooltipText();
                     }, that.recognition, that.langObject.goodbye, that.langObject);
+                } else if(that.voiceSearchStatus && result.includes(that.langObject.result)) {
+                    that.recognition.stop();
+                    that.resultHandler.getNthResult(result.replace(/[^0-9]/g,'')).then(function(response){
+                    that.tooltipHandler.showTooltipText(response);
+                    that.flashingHandler.setToRed();
+                        that.joomlaHelper.getTTS(function(){
+                            that.recognition.start();
+                            that.flashingHandler.setToGreen();
+                            that.tooltipHandler.hideTooltipText();
+                        }, that.recognition, response, that.langObject)
+                    })
                 } else if(result.includes(that.langObject.scroll_down)){
                     window.scrollBy(0, window.innerHeight);
                 } else if(result.includes(that.langObject.scroll_up)){
