@@ -11,6 +11,7 @@ class Voicesearch {
     resultHandler;
     voiceSearchStatus;
     readResults;
+    searchQuery;
 
     constructor(){
         this.recognition.grammars = new webkitSpeechGrammarList();
@@ -32,6 +33,8 @@ class Voicesearch {
 
         that.voiceSearchStatus = sessionStorage.getItem('voicesearchstatus');
         that.readResults = sessionStorage.getItem('readresults');
+        that.searchQuery = sessionStorage.getItem('searchquery');
+
 
         this.joomlaHelper.getLangFromDB(this.dbLang).then(function(response){
             that.langObject = response.data[0];
@@ -39,10 +42,16 @@ class Voicesearch {
                 if(that.readResults == "true"){
                     that.flashingHandler.setToBlue();
                     that.resultHandler = new ResultHandler();
+                    var searchQueryExist = that.searchQuery != undefined && that.searchQuery != null && that.searchQuery != "";
+                    //kivenni a találatokat a tooltip boxból
+                    that.tooltipHandler.showTooltipText(searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames() : " " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames());
                     that.joomlaHelper.getTTS(function(){
                         that.startRecognition(true);
+                        that.tooltipHandler.hideTooltipText();
                         that.flashingHandler.setToGreen();
-                    }, that.recognition, that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames(), that.langObject)
+                    }, that.recognition, 
+                    searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames() : " " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames(), 
+                    that.langObject)
                 } else {
                     that.flashingHandler.setToGreen();
                     that.startRecognition(true);
@@ -77,123 +86,194 @@ class Voicesearch {
             console.log(result);
             
             if(activated){
-                if(result.includes(that.langObject.searchkeyword)){
-                    that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""));
-                    that.flashingHandler.setToRed();
-                    that.joomlaHelper.getTTS(function(){
-                        var searchfield = document.getElementById("searchkeyword");
-                        searchfield.value = result.replace(that.langObject.searchkeyword + " ", "");
-                        that.tooltipHandler.hideTooltipText();
-                        that.recognition.start();
-                        that.flashingHandler.setToGreen();
-                    }, that.recognition, that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""), that.langObject)
-                } else if(result.includes(that.langObject.category)){
-                    var resultFounded = false;
-                    that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""));
-                    that.flashingHandler.setToRed();
-                    that.joomlaHelper.getTTS(function(){
-                        var $options = jQuery("#categories option");
-                        $options.each(function(i){
-                            if($options[i].text.toLowerCase().indexOf(result.toLowerCase().replace(that.langObject.category + " ", "")) >= 0){
-                                jQuery($options[i]).prop('selected',true);
-                                jQuery("#categories").trigger("chosen:updated");
-                                resultFounded = true;
-                            };
-                        })
-                        if(!resultFounded){
-                            that.recognition.stop();
-                            that.tooltipHandler.showTooltipText(that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""));
-                            that.flashingHandler.setToRed();
-                            that.joomlaHelper.getTTS(function(){
-                                that.tooltipHandler.hideTooltipText();
-                                that.recognition.start();
-                                that.flashingHandler.setToGreen();
-                            }, that.recognition, that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject);
-                        } else {
+                if(!result.includes(that.langObject.searchkeyword) && !result.includes(that.langObject.category) && !result.includes(that.langObject.zip) && !result.toLowerCase().includes(that.langObject.city)){
+
+                    if(result.includes(that.langObject.scroll_down)){
+                        window.scrollBy(0, window.innerHeight);
+                    } else if(result.includes(that.langObject.scroll_up)){
+                        window.scrollBy(0, -window.innerHeight);
+                    } else if(result.includes(that.langObject.stop)){ 
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.goodbye);
+                        sessionStorage.setItem('voicesearchstatus', false);
+                        sessionStorage.setItem('readresults', false);
+                        that.joomlaHelper.getTTS(function(){
+                            that.flashingHandler.setToOff();
                             that.tooltipHandler.hideTooltipText();
-                            that.recognition.start();
-                            that.flashingHandler.setToGreen();
-                        }
-                    }, that.recognition, that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject); 
-                
-                } else if(result.includes(that.langObject.zip)){
-                    that.recognition.stop();
-                    that.flashingHandler.setToRed();
-                    that.tooltipHandler.showTooltipText(that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""));
-                    that.joomlaHelper.getTTS(function(){
-                        var ZIP = document.getElementById("zipcode");
-                        ZIP.value = result.replace(that.langObject.zip + " ", "");
-                        that.tooltipHandler.hideTooltipText();
-                        that.recognition.start();
-                        that.flashingHandler.setToGreen();
-                    }, that.recognition, that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""), that.langObject);
-                } else if(result.toLowerCase().includes(that.langObject.city)){
-                    var resultFounded = false;
-                    that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""));
-                    that.flashingHandler.setToRed();
-                    that.joomlaHelper.getTTS(function(){
+                        }, that.recognition, that.langObject.goodbye, that.langObject);
+                    } else {
+                        var words = jQuery.makeArray(result.split(" "));
+    
+                        var searchQuery= [];
+    
+                        var $options = jQuery("#categories option");
+    
+                        $options.each(function(i){
+                            words.each(function(element, index) {
+                                if($options[i].text.toLowerCase().indexOf(words[index].toLowerCase()) >= 0){
+                                    jQuery($options[i]).prop('selected',true);
+                                    jQuery("#categories").trigger("chosen:updated");
+                                    searchQuery.push(words[index].toLowerCase()),
+                                    words.splice(index, 1);
+                                };
+                            })
+                        })
+    
                         var $cities = jQuery("#citySearch option");
+    
                         $cities.each(function(i){
-                            if($cities[i].text.indexOf(result.replace(that.langObject.city + " ", "")) >= 0){
-                                jQuery($cities[i]).prop('selected',true);
-                                jQuery("#citySearch").trigger("chosen:updated");
-                                resultFounded = true;
+                            words.each(function(element, index) {
+                                if($cities[i].text.toLowerCase().indexOf(words[index].toLowerCase()) >= 0){
+                                    jQuery($cities[i]).prop('selected',true);
+                                    jQuery("#citySearch").trigger("chosen:updated");
+                                    searchQuery.push(words[index].toLowerCase()),
+                                    words.splice(index, 1);
+                                }
+                            })
+                        })
+    
+                        var ZIP = document.getElementById("zipcode");
+    
+                        words.each(function(element, index) {
+                            var number = Number(element);
+                            if(number > 0){
+                                ZIP.value = number;
+                                searchQuery.push(number.toString()),
+                                words.splice(index, 1);
                             }
                         })
-                        if(!resultFounded){
-                            that.recognition.stop();
-                            that.tooltipHandler.showTooltipText(that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""));
-                            that.flashingHandler.setToRed();
-                            that.joomlaHelper.getTTS(function(){
-                                that.tooltipHandler.hideTooltipText();
-                                that.recognition.start();
-                                that.flashingHandler.setToGreen();
-                            }, that.recognition, that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""), that.langObject);
-                        } else {
+    
+                        var searchfield = document.getElementById("searchkeyword");
+                        if(words[0] != undefined){
+                            searchQuery.push(words[0]),
+                            searchfield.value = words[0];
+                        }
+    
+                        sessionStorage.setItem('readresults', true);
+                        sessionStorage.setItem('searchquery', searchQuery);
+                        document.getElementById("keywordSearch").submit();
+                    }
+                 
+
+                } else {
+                    if(result.includes(that.langObject.searchkeyword)){
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""));
+                        that.flashingHandler.setToRed();
+                        that.joomlaHelper.getTTS(function(){
+                            var searchfield = document.getElementById("searchkeyword");
+                            searchfield.value = result.replace(that.langObject.searchkeyword + " ", "");
                             that.tooltipHandler.hideTooltipText();
                             that.recognition.start();
                             that.flashingHandler.setToGreen();
-                        }
-                    }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""), that.langObject);
-                } else if(result.includes(that.langObject.search)){
-                    sessionStorage.setItem('readresults', true);
-                    document.getElementById("keywordSearch").submit();
-                } else if(result.includes(that.langObject.stop)) {
-                    that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(that.langObject.goodbye);
-                    sessionStorage.setItem('voicesearchstatus', false);
-                    sessionStorage.setItem('readresults', false);
-                    that.joomlaHelper.getTTS(function(){
-                        that.flashingHandler.setToOff();
-                        that.tooltipHandler.hideTooltipText();
-                    }, that.recognition, that.langObject.goodbye, that.langObject);
-                } else if(that.voiceSearchStatus && result.includes(that.langObject.result)) {
-                    that.recognition.stop();
-                    that.resultHandler.getNthResult(result.replace(/[^0-9]/g,'')).then(function(response){
-                    that.tooltipHandler.showTooltipText(response);
-                    that.flashingHandler.setToRed();
+                        }, that.recognition, that.langObject.searchkeyword + " : " + result.replace(that.langObject.searchkeyword + " ", ""), that.langObject)
+                    } else if(result.includes(that.langObject.category)){
+                        var resultFounded = false;
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""));
+                        that.flashingHandler.setToRed();
+                        that.joomlaHelper.getTTS(function(){
+                            var $options = jQuery("#categories option");
+                            $options.each(function(i){
+                                if($options[i].text.toLowerCase().indexOf(result.toLowerCase().replace(that.langObject.category + " ", "")) >= 0){
+                                    jQuery($options[i]).prop('selected',true);
+                                    jQuery("#categories").trigger("chosen:updated");
+                                    resultFounded = true;
+                                };
+                            })
+                            if(!resultFounded){
+                                that.recognition.stop();
+                                that.tooltipHandler.showTooltipText(that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""));
+                                that.flashingHandler.setToRed();
+                                that.joomlaHelper.getTTS(function(){
+                                    that.tooltipHandler.hideTooltipText();
+                                    that.recognition.start();
+                                    that.flashingHandler.setToGreen();
+                                }, that.recognition, that.langObject.sorry + that.langObject.category + that.langObject.no_result + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject);
+                            } else {
+                                that.tooltipHandler.hideTooltipText();
+                                that.recognition.start();
+                                that.flashingHandler.setToGreen();
+                            }
+                        }, that.recognition, that.langObject.category + " : " + result.toLowerCase().replace(that.langObject.category + " ", ""), that.langObject); 
+                    
+                    } else if(result.includes(that.langObject.zip)){
+                        that.recognition.stop();
+                        that.flashingHandler.setToRed();
+                        that.tooltipHandler.showTooltipText(that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""));
+                        that.joomlaHelper.getTTS(function(){
+                            var ZIP = document.getElementById("zipcode");
+                            ZIP.value = result.replace(that.langObject.zip + " ", "");
+                            that.tooltipHandler.hideTooltipText();
+                            that.recognition.start();
+                            that.flashingHandler.setToGreen();
+                        }, that.recognition, that.langObject.zip + " : " + result.replace(that.langObject.zip + " ", ""), that.langObject);
+                    } else if(result.toLowerCase().includes(that.langObject.city)){
+                        var resultFounded = false;
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""));
+                        that.flashingHandler.setToRed();
+                        that.joomlaHelper.getTTS(function(){
+                            var $cities = jQuery("#citySearch option");
+                            $cities.each(function(i){
+                                if($cities[i].text.indexOf(result.replace(that.langObject.city + " ", "")) >= 0){
+                                    jQuery($cities[i]).prop('selected',true);
+                                    jQuery("#citySearch").trigger("chosen:updated");
+                                    resultFounded = true;
+                                }
+                            })
+                            if(!resultFounded){
+                                that.recognition.stop();
+                                that.tooltipHandler.showTooltipText(that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""));
+                                that.flashingHandler.setToRed();
+                                that.joomlaHelper.getTTS(function(){
+                                    that.tooltipHandler.hideTooltipText();
+                                    that.recognition.start();
+                                    that.flashingHandler.setToGreen();
+                                }, that.recognition, that.langObject.sorry + that.langObject.city + that.langObject.no_result + result.replace(that.langObject.city + " ", ""), that.langObject);
+                            } else {
+                                that.tooltipHandler.hideTooltipText();
+                                that.recognition.start();
+                                that.flashingHandler.setToGreen();
+                            }
+                        }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""), that.langObject);
+                    } else if(result.includes(that.langObject.search)){
+                        sessionStorage.setItem('readresults', true);
+                        document.getElementById("keywordSearch").submit();
+                    } else if(result.includes(that.langObject.stop)) {
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.goodbye);
+                        sessionStorage.setItem('voicesearchstatus', false);
+                        sessionStorage.setItem('readresults', false);
+                        that.joomlaHelper.getTTS(function(){
+                            that.flashingHandler.setToOff();
+                            that.tooltipHandler.hideTooltipText();
+                        }, that.recognition, that.langObject.goodbye, that.langObject);
+                    } else if(that.voiceSearchStatus && result.includes(that.langObject.result)) {
+                        that.recognition.stop();
+                        that.resultHandler.getNthResult(result.replace(/[^0-9]/g,'')).then(function(response){
+                        that.tooltipHandler.showTooltipText(response);
+                        that.flashingHandler.setToRed();
+                            that.joomlaHelper.getTTS(function(){
+                                that.recognition.start();
+                                that.flashingHandler.setToGreen();
+                                that.tooltipHandler.hideTooltipText();
+                            }, that.recognition, response, that.langObject)
+                        })
+                    } else if(result.includes(that.langObject.scroll_down)){
+                        window.scrollBy(0, window.innerHeight);
+                    } else if(result.includes(that.langObject.scroll_up)){
+                        window.scrollBy(0, -window.innerHeight);
+                    } else {
+                        that.recognition.stop();
+                        that.tooltipHandler.showTooltipText(that.langObject.error + result);
+                        that.flashingHandler.setToRed()
                         that.joomlaHelper.getTTS(function(){
                             that.recognition.start();
                             that.flashingHandler.setToGreen();
                             that.tooltipHandler.hideTooltipText();
-                        }, that.recognition, response, that.langObject)
-                    })
-                } else if(result.includes(that.langObject.scroll_down)){
-                    window.scrollBy(0, window.innerHeight);
-                } else if(result.includes(that.langObject.scroll_up)){
-                    window.scrollBy(0, -window.innerHeight);
-                } else {
-                    that.recognition.stop();
-                    that.tooltipHandler.showTooltipText(that.langObject.error + result);
-                    that.flashingHandler.setToRed()
-                    that.joomlaHelper.getTTS(function(){
-                        that.recognition.start();
-                        that.flashingHandler.setToGreen();
-                        that.tooltipHandler.hideTooltipText();
-                    }, that.recognition, that.langObject.error + result, that.langObject);
+                        }, that.recognition, that.langObject.error + result, that.langObject);
+                    }
                 }
             } else {
                 if(result.includes(that.langObject.stop)){ 
