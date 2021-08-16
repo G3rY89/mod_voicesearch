@@ -1,18 +1,19 @@
 class ResultHandler{
 
     featuredResultList;
+    resultContainer;
 
     constructor(){
+        this.resultContainer = jQuery("#results-container")[0];
         this.featuredResultList = this.getFeaturedResults();
     }
 
     getFeaturedResults(){
+        var that = this;
         var featuredResultList = [];
 
-        var results = jQuery("#results-container");
-        if(results != null){
-           var resultContainer = $(results[0]);
-           var nodeArray =  Array.prototype.slice.call(resultContainer.childNodes);
+        if(this.resultContainer != null){
+           var nodeArray =  Array.prototype.slice.call(that.resultContainer.childNodes);
             nodeArray.each(function(item, index){
                 if( typeof jQuery(nodeArray[index]).attr('class') !== "undefined" && jQuery(nodeArray[index]).attr('class').indexOf('featured') >= 0)
                     featuredResultList.push(jQuery(item));
@@ -32,16 +33,46 @@ class ResultHandler{
                 var nodeArray = Array.prototype.slice.call(resultContainer[0].childNodes);
                 nodeArray.each(function(item, index){
                     if( typeof jQuery(nodeArray[index]).attr('class') !== "undefined" && jQuery(nodeArray[index]).attr('class').indexOf('business-container') >= 0){
-                        var secondNodeArray = Array.prototype.slice.call(item.childNodes);
-                        secondNodeArray.each(function(item1, index1){
-                            if( typeof jQuery(secondNodeArray[index1]).attr('class') !== "undefined" && jQuery(secondNodeArray[index1]).attr('class').indexOf('kozepcim2') >= 0){
-                                companyNames += item1.innerText + ', ';
-                            }
-                        })
+                        companyNames += item.firstElementChild.innerText + ', ';
                     }
                 })
             })
         }
         return companyNames;
+    }
+
+    getNthResult(nthResult){
+        var that = this;
+
+        var companyName = "";
+
+        if(this.resultContainer != null){
+            var nodeArray =  Array.prototype.slice.call(that.resultContainer.childNodes);
+            var filteredNodeArray = nodeArray.filter(function(el) {return el.nodeName != "#text"});
+            try{
+                var resultContainer = jQuery(filteredNodeArray[nthResult-1]);
+                var nodeArray = Array.prototype.slice.call(resultContainer[0].childNodes);
+                nodeArray.each(function(item, index){
+                    if( typeof jQuery(nodeArray[index]).attr('class') !== "undefined" && jQuery(nodeArray[index]).attr('class').indexOf('business-container') >= 0){
+                        companyName = item.firstElementChild.innerText + ', ';
+                    }
+                })
+                return new Promise(function(resolve, reject){
+                    var request = jQuery.ajax({
+                        url: 'index.php?option=com_ajax&module=voicesearch&method=getCompanyData&format=json',
+                        type: "post",
+                        data:{companyName:companyName.replace(/,\s*$/, "").substring(companyName.indexOf(" ") + 1)}
+                    });
+                    request.success(function(response){
+                        var result =  "Cégnév. " + response.data[0].name + ", Weboldal. " + response.data[0].website + ", Telefonszám. " + response.data[0].phone + ", Email cím. " + response.data[0].email;
+                        resolve(result);
+                    })
+                })   
+            } catch(err){
+                return new Promise(function(resolve, reject){
+                    resolve("Nincs ilyen találat");
+                }); 
+            }
+        }
     }
 }

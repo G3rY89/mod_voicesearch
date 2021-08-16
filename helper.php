@@ -15,7 +15,7 @@ class ModVoiceSearchHelper
         $db = JFactory::getDbo();
 
         $query = $db->getQuery(true)
-                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'featured_results', 'tts_voice', 'lang')))
+                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'result', 'featured_results', 'new_search', 'tts_voice', 'lang')))
                     ->from($db->quoteName('#__voicesearch'))
                     ->where($db->quoteName('lang') .' LIKE ' . $db->quote('%' . $lang . '%'));
                     
@@ -44,5 +44,21 @@ class ModVoiceSearchHelper
         ]);
 
         return $voice['response'];
+    }
+
+    public static function getCompanyDataAjax(){
+        $companyName = $_POST["companyName"];
+        
+        $db = JFactory::getDbo();
+
+        $query = $db->getQuery(true)
+                    ->select($db->quoteName(array('name', 'website', 'phone', 'email')))
+                    ->from($db->quoteName('#__jbusinessdirectory_companies'))
+                    ->where($db->quoteName('name') .' LIKE ' . $db->quote('%' . $companyName . '%'));
+        $db->setQuery($query);
+
+        $result = $db->loadObjectList();
+        
+        return $result;
     }
 }
