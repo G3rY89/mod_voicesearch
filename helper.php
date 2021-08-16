@@ -15,7 +15,7 @@ class ModVoiceSearchHelper
         $db = JFactory::getDbo();
 
         $query = $db->getQuery(true)
-                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'result', 'featured_results', 'tts_voice', 'lang')))
+                    ->select($db->quoteName(array('searchkeyword', 'category', 'zip', 'city', 'search', 'start', 'stop', 'greeting', 'goodbye', 'error', 'sorry', 'no_result', 'scroll_down', 'scroll_up', 'result', 'featured_results', 'new_search', 'tts_voice', 'lang')))
                     ->from($db->quoteName('#__voicesearch'))
                     ->where($db->quoteName('lang') .' LIKE ' . $db->quote('%' . $lang . '%'));
                     
