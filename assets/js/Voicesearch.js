@@ -42,7 +42,7 @@ class Voicesearch {
                 if(that.readResults == "true"){
                     that.flashingHandler.setToBlue();
                     that.resultHandler = new ResultHandler();
-                    var searchQueryExist = that.searchQuery != undefined && that.searchQuery != null && that.searchQuery != "";
+                    var searchQueryExist = that.searchQuery != undefined || that.searchQuery != null || that.searchQuery != "";
                     //kivenni a találatokat a tooltip boxból
                     that.tooltipHandler.showTooltipText(searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames() : " " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames());
                     that.joomlaHelper.getTTS(function(){
@@ -86,7 +86,12 @@ class Voicesearch {
             console.log(result);
             
             if(activated){
-                if(!result.includes(that.langObject.searchkeyword) && !result.includes(that.langObject.category) && !result.includes(that.langObject.zip) && !result.toLowerCase().includes(that.langObject.city)){
+                if(!result.includes(that.langObject.search) && 
+                !result.includes(that.langObject.searchkeyword) && 
+                !result.includes(that.langObject.category) && 
+                !result.includes(that.langObject.zip) && 
+                !result.toLowerCase().includes(that.langObject.city) && 
+                !result.includes(that.langObject.result)){
 
                     if(result.includes(that.langObject.scroll_down)){
                         window.scrollBy(0, window.innerHeight);
@@ -237,6 +242,15 @@ class Voicesearch {
                                 that.flashingHandler.setToGreen();
                             }
                         }, that.recognition, that.langObject.city + " : " + result.replace(that.langObject.city + " ", ""), that.langObject);
+                    } else if(that.voiceSearchStatus == "true" && result.toLowerCase().includes(that.langObject.new_search)) {
+                        var searchfield = document.getElementById("searchkeyword");
+                        searchfield.value = "";
+                        jQuery("#categories option:selected").removeAttr("selected");
+                        jQuery("#categories").trigger("chosen:updated");
+                        var ZIP = document.getElementById("zipcode");
+                        ZIP.value = "";
+                        jQuery("#citySearch option:selected").removeAttr("selected");
+                        jQuery("#citySearch").trigger("chosen:updated");
                     } else if(result.includes(that.langObject.search)){
                         sessionStorage.setItem('readresults', true);
                         document.getElementById("keywordSearch").submit();
@@ -249,7 +263,7 @@ class Voicesearch {
                             that.flashingHandler.setToOff();
                             that.tooltipHandler.hideTooltipText();
                         }, that.recognition, that.langObject.goodbye, that.langObject);
-                    } else if(that.voiceSearchStatus && result.includes(that.langObject.result)) {
+                    } else if(that.voiceSearchStatus == "true" && result.includes(that.langObject.result)) {
                         that.recognition.stop();
                         that.resultHandler.getNthResult(result.replace(/[^0-9]/g,'')).then(function(response){
                         that.tooltipHandler.showTooltipText(response);
