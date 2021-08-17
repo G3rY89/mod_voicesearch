@@ -43,14 +43,22 @@ class Voicesearch {
                     that.flashingHandler.setToBlue();
                     that.resultHandler = new ResultHandler();
                     var searchQueryExist = that.searchQuery != undefined || that.searchQuery != null || that.searchQuery != "";
+                    var companyNames = that.resultHandler.getFeaturedResultsCompanyNames();
+                    var isResult = companyNames == "" ? false : true;
+                    var resultToSay = "";
+                    if(isResult){
+                        resultToSay = that.langObject.featured_results + companyNames;
+                    } else {
+                        resultToSay = "Nincs találat";
+                    }
                     //kivenni a találatokat a tooltip boxból
-                    that.tooltipHandler.showTooltipText(searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames() : " " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames());
+                    that.tooltipHandler.showTooltipText(searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + resultToSay : " " + resultToSay);
                     that.joomlaHelper.getTTS(function(){
                         that.startRecognition(true);
                         that.tooltipHandler.hideTooltipText();
                         that.flashingHandler.setToGreen();
                     }, that.recognition, 
-                    searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames() : " " + that.langObject.featured_results + that.resultHandler.getFeaturedResultsCompanyNames(), 
+                    searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + resultToSay : " " + resultToSay, 
                     that.langObject)
                 } else {
                     that.flashingHandler.setToGreen();
