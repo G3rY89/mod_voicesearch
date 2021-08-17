@@ -15,8 +15,11 @@ class ResultHandler{
         if(this.resultContainer != null){
            var nodeArray =  Array.prototype.slice.call(that.resultContainer.childNodes);
             nodeArray.each(function(item, index){
-                if( typeof jQuery(nodeArray[index]).attr('class') !== "undefined" && jQuery(nodeArray[index]).attr('class').indexOf('featured') >= 0)
+                if( typeof jQuery(nodeArray[index]).attr('class') !== "undefined" && jQuery(nodeArray[index]).attr('class').indexOf('featured') >= 0){
                     featuredResultList.push(jQuery(item));
+                } else if(index <= 3) {
+                    featuredResultList.push(jQuery(item));
+                }
             });
         }
         return featuredResultList;
