@@ -60,6 +60,7 @@ class Voicesearch {
                     }, that.recognition, 
                     searchQueryExist ? "Amire kerestem: " + that.searchQuery + ". " + resultToSay : " " + resultToSay, 
                     that.langObject)
+                    sessionStorage.clear();
                 } else {
                     that.flashingHandler.setToGreen();
                     that.startRecognition(true);
@@ -71,6 +72,22 @@ class Voicesearch {
                 }, 3000);
                 that.startRecognition(false);
             }
+
+            document.addEventListener("visibilitychange", function() {
+                if (document.visibilityState === 'visible') {
+                  that.recognition.start();
+                } else {
+                    that.recognition.stop();
+                }
+            });
+
+            jQuery(window).focus(function() {
+                that.recognition.start();
+            });
+            
+            jQuery(window).blur(function() {
+                that.recognition.stop();
+            });
         });
     }
 
@@ -108,8 +125,7 @@ class Voicesearch {
                     } else if(result.includes(that.langObject.stop)){ 
                         that.recognition.stop();
                         that.tooltipHandler.showTooltipText(that.langObject.goodbye);
-                        sessionStorage.setItem('voicesearchstatus', false);
-                        sessionStorage.setItem('readresults', false);
+                        sessionStorage.clear();
                         that.joomlaHelper.getTTS(function(){
                             that.flashingHandler.setToOff();
                             that.tooltipHandler.hideTooltipText();
@@ -117,7 +133,7 @@ class Voicesearch {
                     } else {
                         var words = jQuery.makeArray(result.split(" "));
     
-                        var searchQuery= [];
+                        that.searchQuery= [];
     
                         var $options = jQuery("#categories option");
     
@@ -126,7 +142,7 @@ class Voicesearch {
                                 if($options[i].text.toLowerCase().indexOf(words[index].toLowerCase()) >= 0){
                                     jQuery($options[i]).prop('selected',true);
                                     jQuery("#categories").trigger("chosen:updated");
-                                    searchQuery.push(words[index].toLowerCase()),
+                                    that.searchQuery.push(words[index].toLowerCase()),
                                     words.splice(index, 1);
                                 };
                             })
@@ -139,7 +155,7 @@ class Voicesearch {
                                 if($cities[i].text.toLowerCase().indexOf(words[index].toLowerCase()) >= 0){
                                     jQuery($cities[i]).prop('selected',true);
                                     jQuery("#citySearch").trigger("chosen:updated");
-                                    searchQuery.push(words[index].toLowerCase()),
+                                    that.searchQuery.push(words[index].toLowerCase()),
                                     words.splice(index, 1);
                                 }
                             })
@@ -151,19 +167,20 @@ class Voicesearch {
                             var number = Number(element);
                             if(number > 0){
                                 ZIP.value = number;
-                                searchQuery.push(number.toString()),
+                                that.searchQuery.push(number.toString()),
                                 words.splice(index, 1);
                             }
                         })
     
                         var searchfield = document.getElementById("searchkeyword");
                         if(words[0] != undefined){
-                            searchQuery.push(words[0]),
+                            that.searchQuery.push(words[0]),
                             searchfield.value = words[0];
                         }
     
                         sessionStorage.setItem('readresults', true);
-                        sessionStorage.setItem('searchquery', searchQuery);
+                        sessionStorage.setItem('voicesearchstatus', true);
+                        sessionStorage.setItem('searchquery', that.searchQuery);
                         document.getElementById("keywordSearch").submit();
                     }
                  
@@ -321,6 +338,7 @@ class Voicesearch {
                 }
             }
         }
+
     }
 
     emptySessionStorage() {
