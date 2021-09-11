@@ -73,19 +73,10 @@ class Voicesearch {
                 that.startRecognition(false);
             }
 
-            document.addEventListener("visibilitychange", function() {
-                if (document.visibilityState === 'visible') {
-                  that.recognition.start();
-                } else {
-                    that.recognition.stop();
-                }
-            });
-
-            jQuery(window).focus(function() {
+            jQuery(document).mouseenter(function () {
                 that.recognition.start();
             });
-            
-            jQuery(window).blur(function() {
+            jQuery(document).mouseleave(function () {
                 that.recognition.stop();
             });
         });
