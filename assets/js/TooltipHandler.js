@@ -13,7 +13,7 @@ class TooltipHandler {
             'visibility' :'visible',
             'opacity': 1,
         });
-
+        this.tooltipText.text('');
         this.tooltipText.text(tooltiptext);
     }
 

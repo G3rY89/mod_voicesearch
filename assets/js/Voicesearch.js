@@ -26,7 +26,14 @@ class Voicesearch {
         this.flashingHandler = new FlashingHandler();
 
         this.emptySessionStorage();
+        
+        jQuery(document).ready(function(){
+            if(sessionStorage.getItem('voicesearchstatus') == "true"){
+                voiceSearch.start();
+            }
+        })
     };
+
 
     start(){
         var that = this;
@@ -66,19 +73,16 @@ class Voicesearch {
                     that.startRecognition(true);
                 }
             } else {
-                that.tooltipHandler.showTooltipText("Hangvezérlés aktiválásához kattints ide!");
-                setTimeout(function(){
-                    that.tooltipHandler.hideTooltipText();
-                }, 3000);
                 that.startRecognition(false);
             }
 
-            jQuery(document).mouseenter(function () {
-                that.recognition.start();
+            /* jQuery(document).mouseenter(function () {
+                var isActivated = sessionStorage.getItem('voicesearchstatus') == "true" ? true : false;
+                that.startRecognition(isActivated);
             });
             jQuery(document).mouseleave(function () {
                 that.recognition.stop();
-            });
+            }); */
         });
     }
 
