@@ -25,6 +25,5 @@ require JModuleHelper::getLayoutPath('mod_voicesearch');
 <script type="text/javascript">
 
     var voiceSearch = new Voicesearch();
-    voiceSearch.start();
     
 </script>
