@@ -12,9 +12,11 @@ class Voicesearch {
     voiceSearchStatus;
     readResults;
     searchQuery;
+    recognizing;
 
     constructor(){
         this.recognition.grammars = new webkitSpeechGrammarList();
+        this.recognizing = false;
         this.recognition.continuous = true;
         this.recognition.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
         this.recognition.interimResults = false;
@@ -75,14 +77,6 @@ class Voicesearch {
             } else {
                 that.startRecognition(false);
             }
-
-            /* jQuery(document).mouseenter(function () {
-                var isActivated = sessionStorage.getItem('voicesearchstatus') == "true" ? true : false;
-                that.startRecognition(isActivated);
-            });
-            jQuery(document).mouseleave(function () {
-                that.recognition.stop();
-            }); */
         });
     }
 
@@ -91,13 +85,29 @@ class Voicesearch {
 
         var activated = activated;
 
-        that.recognition.start();
+        that.recognition.start(); 
+
+        jQuery(document).on('mouseenter', function () {
+            if(!that.recognizing){
+                that.recognition.start();       
+            }
+        });
+        jQuery(document).mouseleave(function () {
+            if(that.recognizing){
+                that.recognition.stop();
+            }
+        });
 
         that.recognition.onend = function(){
+            that.recognizing = false;
             that.recognition.stop();
             jQuery("#voicesearch").on("click", function(){
                 start();
             })
+        }
+
+        that.recognition.onstart = function(){
+            that.recognizing = true;
         }
 
         that.recognition.onresult = function(event) {
