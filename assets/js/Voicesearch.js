@@ -20,7 +20,8 @@ class Voicesearch {
         this.recognizing = false;
         this.recognition.continuous = this.recognitionForDiarization.continuous = true;
         this.recognition.lang = this.recognitionForDiarization.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
-        this.recognition.interimResults = this.recognitionForDiarization.interimResults = false;
+        this.recognition.interimResults = false;
+        this.recognitionForDiarization.interimResults = true;
         this.recognition.maxAlternatives = this.recognitionForDiarization.maxAlternatives = 1;
 
         this.dbLang = this.recognition.lang.contains('hu') ? 'hu' : 'en';
