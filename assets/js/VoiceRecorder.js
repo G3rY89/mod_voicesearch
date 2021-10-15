@@ -5,13 +5,11 @@ class VoiceRecorder {
     input;
 
     constructor(){
-        URL = window.URL || window.webkitURL;
 
-        var AudioContext = window.AudioContext || window.webkitAudioContext;
-        var audioContext
     }    
 
     startRecording() {
+        var that = this;
         console.log("recording started");
 
         var constraints = { audio: true, video:false }
@@ -19,12 +17,11 @@ class VoiceRecorder {
         navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
             console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
 
-            audioContext = new AudioContext();
-            document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
-            gumStream = stream;
-            input = audioContext.createMediaStreamSource(stream);
-            rec = new Recorder(input,{numChannels:1})
-            rec.record()
+            var audioContext = new AudioContext();
+            that.gumStream = stream;
+            that.input = audioContext.createMediaStreamSource(stream);
+            that.rec = new Recorder(input,{numChannels:1})
+            that.rec.record()
             console.log("Recording started");
 
         }).catch(function(err) {
@@ -33,41 +30,37 @@ class VoiceRecorder {
     }
 
     pauseRecording(){
-        console.log("pauseButton clicked rec.recording=",rec.recording );
+        var that = this;
         if (rec.recording){
-            rec.stop();
+            that.rec.stop();
         }else{
-            rec.record();
+            that.rec.record();
         }
     }
 
     stopRecording() {
+        var that = this;
         console.log("recording stopped");
         
-        rec.stop();
-        gumStream.getAudioTracks()[0].stop();
+        that.rec.stop();
+        that.gumStream.getAudioTracks()[0].stop();
 
-        rec.exportWAV(createDownloadLink);
+        that.rec.exportWAV(createDownloadLink);
     }
 
     uploadFileForDiarization(blob) {
 
-        var filename = new Date().toISOString();
-        
-        var upload = document.createElement('a');
-        upload.href="#";
-        upload.innerHTML = "Upload";
-        upload.addEventListener("click", function(event){
-            var xhr=new XMLHttpRequest();
-            xhr.onload=function(e) {
-                if(this.readyState === 4) {
-                    console.log("Server returned: ",e.target.responseText);
-                }
-            };
-            var fd=new FormData();
-            fd.append("audio_data",blob, filename);
-            xhr.open("POST","upload.php",true);
-            xhr.send(fd);
-        })
+        //var filename = new Date().toISOString();
+
+        var xhr=new XMLHttpRequest();
+        xhr.onload=function(e) {
+            if(this.readyState === 4) {
+                console.log("Server returned: ",e.target.responseText);
+            }
+        };
+        //var fd=new FormData();
+        //fd.append("audio_data",blob, filename);
+        xhr.open("POST","https://dev-diarization.herokuapp.com/recognize",true);
+        xhr.send(blob);
     }
 }
