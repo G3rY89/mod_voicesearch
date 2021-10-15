@@ -1,6 +1,7 @@
 class Voicesearch {
     
     recognition = new webkitSpeechRecognition();
+    recognitionForDiarization = new webkitSpeechRecognition();
     userLang = navigator.language || navigator.userLanguage;
     langObject;
     dbLang; 
@@ -15,12 +16,12 @@ class Voicesearch {
     recognizing;
 
     constructor(){
-        this.recognition.grammars = new webkitSpeechGrammarList();
+        this.recognition.grammars = this.recognitionForDiarization.grammars = new webkitSpeechGrammarList();
         this.recognizing = false;
-        this.recognition.continuous = true;
-        this.recognition.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
-        this.recognition.interimResults = false;
-        this.recognition.maxAlternatives = 1;
+        this.recognition.continuous = this.recognitionForDiarization.continuous = true;
+        this.recognition.lang = this.recognitionForDiarization.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
+        this.recognition.interimResults = this.recognitionForDiarization.interimResults = false;
+        this.recognition.maxAlternatives = this.recognitionForDiarization.maxAlternatives = 1;
 
         this.dbLang = this.recognition.lang.contains('hu') ? 'hu' : 'en';
         this.tooltipHandler = new TooltipHandler();
@@ -102,7 +103,7 @@ class Voicesearch {
             that.recognizing = false;
             that.recognition.stop();
             jQuery("#voicesearch").on("click", function(){
-                start();
+                that.start();
             })
         }
 
