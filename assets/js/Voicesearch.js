@@ -1,7 +1,6 @@
 class Voicesearch {
     
     recognition = new webkitSpeechRecognition();
-    recognitionForDiarization = new webkitSpeechRecognition();
     userLang = navigator.language || navigator.userLanguage;
     langObject;
     dbLang; 
@@ -14,20 +13,23 @@ class Voicesearch {
     readResults;
     searchQuery;
     recognizing;
+    voiceRecorder;
+    slaveDiarization;
 
     constructor(){
-        this.recognition.grammars = this.recognitionForDiarization.grammars = new webkitSpeechGrammarList();
+        this.recognition.grammars = new webkitSpeechGrammarList();
         this.recognizing = false;
-        this.recognition.continuous = this.recognitionForDiarization.continuous = true;
-        this.recognition.lang = this.recognitionForDiarization.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
+        this.recognition.continuous = true;
+        this.recognition.lang = 'hu-HU'; /* userLang.contains('hu') || userLang.contains('en') ? userLang : 'hu-HU'; */ 
         this.recognition.interimResults = false;
-        this.recognitionForDiarization.interimResults = true;
-        this.recognition.maxAlternatives = this.recognitionForDiarization.maxAlternatives = 1;
+        this.recognition.maxAlternatives = 1;
 
         this.dbLang = this.recognition.lang.contains('hu') ? 'hu' : 'en';
         this.tooltipHandler = new TooltipHandler();
         this.joomlaHelper = new JoomlaHelper();
         this.flashingHandler = new FlashingHandler();
+        this.voiceRecorder = new VoiceRecorder();
+        this.slaveDiarization = new SlaveDiarization();
 
         this.emptySessionStorage();
         
@@ -38,14 +40,12 @@ class Voicesearch {
         })
     };
 
-
     start(){
         var that = this;
 
         that.voiceSearchStatus = sessionStorage.getItem('voicesearchstatus');
         that.readResults = sessionStorage.getItem('readresults');
         that.searchQuery = sessionStorage.getItem('searchquery');
-
 
         this.joomlaHelper.getLangFromDB(this.dbLang).then(function(response){
             that.langObject = response.data[0];
@@ -87,22 +87,28 @@ class Voicesearch {
 
         var activated = activated;
 
-        that.recognition.start(); 
+        that.recognition.start();
 
-        jQuery(document).on('mouseenter', function () {
-            if(!that.recognizing){
-                that.recognition.start();       
-            }
-        });
-        jQuery(document).mouseleave(function () {
-            if(that.recognizing){
-                that.recognition.stop();
-            }
-        });
+        if(activated){
+            jQuery(document).on('mouseenter', function () {
+                if(!that.recognizing){
+                    that.recognition.start();       
+                }
+            });
+            jQuery(document).mouseleave(function () {
+                if(that.recognizing){
+                    that.recognition.stop();
+                }
+            });
+        }
 
         that.recognition.onend = function(){
             that.recognizing = false;
             that.recognition.stop();
+            /* if(activated){
+                that.voiceRecorder.startRecording();
+                that.slaveDiarization.diarization(that.voiceRecorder);
+            } */
             jQuery("#voicesearch").on("click", function(){
                 that.start();
             })
@@ -132,7 +138,8 @@ class Voicesearch {
                     } else if(result.includes(that.langObject.stop)){ 
                         that.recognition.stop();
                         that.tooltipHandler.showTooltipText(that.langObject.goodbye);
-                        sessionStorage.clear();
+                        sessionStorage.setItem('voicesearchstatus', false);
+                        sessionStorage.setItem('readresults', false);
                         that.joomlaHelper.getTTS(function(){
                             that.flashingHandler.setToOff();
                             that.tooltipHandler.hideTooltipText();

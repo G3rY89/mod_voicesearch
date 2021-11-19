@@ -45,7 +45,7 @@ class VoiceRecorder {
         that.rec.stop();
         that.gumStream.getAudioTracks()[0].stop();
 
-        that.rec.exportWAV(createDownloadLink);
+        that.rec.exportWAV(uploadFileForDiarization);
     }
 
     uploadFileForDiarization(blob) {
@@ -55,11 +55,13 @@ class VoiceRecorder {
         var xhr=new XMLHttpRequest();
         xhr.onload=function(e) {
             if(this.readyState === 4) {
-                console.log("Server returned: ",e.target.responseText);
+                console.log("Server returned: ",xhr.response);
             }
         };
         //var fd=new FormData();
         //fd.append("audio_data",blob, filename);
+        xhr.setRequestHeader("VoiceAssistantName", "Mate");
+        xhr.setRequestHeader("Content-Type", "audio/wave");
         xhr.open("POST","https://dev-diarization.herokuapp.com/recognize",true);
         xhr.send(blob);
     }

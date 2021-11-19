@@ -1,9 +1,13 @@
 class JoomlaHelper {
 
     playbackHandler;
+    slaveDiarization;
+    voiceRecorder;
 
     constructor(){
         this.playbackHandler = new PlaybackHandler();
+        this.slaveDiarization = new SlaveDiarization();
+        this.voiceRecorder = new VoiceRecorder();
     }
 
     getLangFromDB(lang){
@@ -32,6 +36,8 @@ class JoomlaHelper {
             }
         });
         request.success(function(response){
+            that.voiceRecorder.startRecording();
+            that.slaveDiarization.diarization();
             that.playbackHandler.play(response.data).then(function(){
                 reaction(recognition);
             });
