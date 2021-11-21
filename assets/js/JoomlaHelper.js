@@ -37,7 +37,7 @@ class JoomlaHelper {
         });
         request.success(function(response){
             that.voiceRecorder.startRecording();
-            that.slaveDiarization.diarization();
+            that.slaveDiarization.diarization(that.voiceRecorder);
             that.playbackHandler.play(response.data).then(function(){
                 reaction(recognition);
             });
