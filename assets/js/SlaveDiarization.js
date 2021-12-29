@@ -20,7 +20,7 @@ class SlaveDiarization{
             var result = event.results[last][0].transcript;
             console.log(result);
 
-            if(result.includes("stop")){
+            if(result.includes("állj")){
                 that.recognition.stop();
                 voiceRecorder.stopRecording();
                 

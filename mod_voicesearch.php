@@ -17,6 +17,7 @@ $document->addScript('modules/mod_voicesearch/assets/js/FlashingHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/ResultHandler.js');
 $document->addScript('modules/mod_voicesearch/assets/js/VoiceRecorder.js');
 $document->addScript('modules/mod_voicesearch/assets/js/SlaveDiarization.js');
+$document->addScript('modules/mod_voicesearch/assets/js/BlobBuilder.js');
 
 JHtml::_('stylesheet', 'modules/mod_voicesearch/assets/style.css');
 
