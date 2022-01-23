@@ -46,7 +46,10 @@ class VoiceRecorder {
         console.log('Created MediaRecorder', that.mediaRecorder, 'with options', options);
         that.mediaRecorder.onstop = function(){
           var blobs = that.blobBuilder.getBlob();
-          that.uploadFileForDiarization(blobs);
+          that.blobBuilder.blobToBase64(blobs).then(function(res){
+            var base64String = res.substring(res.indexOf(',') + 1);
+            that.uploadFileForDiarization(base64String);
+          })
         }
 
         that.mediaRecorder.ondataavailable = function(event){
@@ -54,7 +57,7 @@ class VoiceRecorder {
             that.blobBuilder.append(event.data);
           }
         };
-        that.mediaRecorder.start(10); // collect 10ms of data
+        that.mediaRecorder.start(10000); // collect 10ms of data
         console.log('MediaRecorder started', that.mediaRecorder);
       },
         that.successCallback,
@@ -67,20 +70,25 @@ class VoiceRecorder {
       that.mediaRecorder.stop();
     }
 
-    uploadFileForDiarization(blob) {
-          
-      var xhr=new XMLHttpRequest();
-      xhr.onload=function(e) {
-          if(this.readyState === 4) {
-              console.log("Server returned: ",xhr.response);
-          }
-      };
-      xhr.open("POST","http://localhost:8080/recognize",true);
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); 
-      xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-      xhr.setRequestHeader("VoiceAssistantName", "Mate");
-      xhr.setRequestHeader("Content-Type", "audio/webm");
-      xhr.send(blob);
+    uploadFileForDiarization(base64String) {
+
+      var base64AudioDto = 
+      {
+        base64String: base64String
+      }
+
+      var request = jQuery.ajax({
+        method: 'POST',
+        url: "http://localhost:8080/recognize",
+        data: base64AudioDto,
+        headers: {
+          "VoiceAssistantName": "Mate"
+        },
+      });
+
+      request.done(function(res){
+        console.log(res);
+      });
     }
 
     successCallback(stream) {
@@ -91,12 +99,5 @@ class VoiceRecorder {
     errorCallback(error) {
       console.log('navigator.getUserMedia error: ', error);
     }
-
-    /* handleDataAvailable(event) {
-      var that = this;
-      if (event.data && event.data.size > 0) {
-        that.recordedBlobs.push(event.data);
-      }
-    } */
 }
 
