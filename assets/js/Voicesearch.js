@@ -1,3 +1,6 @@
+/**
+ * Main class of the module
+ */
 class Voicesearch {
     
     recognition = new webkitSpeechRecognition();
@@ -40,6 +43,12 @@ class Voicesearch {
         })
     };
 
+    /**
+     * Gets the language object from the database and checks if the application has been already started 
+     * (when the user navigates to another page, the status of the voice search is saved into the session)
+     * if so, it automatically turns on the voicesearch on the current page else it starts a new recognition
+     * @see startRecognition
+     */
     start(){
         var that = this;
 
@@ -82,6 +91,12 @@ class Voicesearch {
         });
     }
 
+    /**
+     * This method contains the main business logic of the voice search.
+     * Starts the recognition and "listens" to the keywords which are already loaded from the db.
+     * If there is a match fires the corresponding command.
+     * @param {boolean} activated 
+     */
     startRecognition(activated){
         var that = this;
 
@@ -355,6 +370,10 @@ class Voicesearch {
 
     }
 
+    /**
+     * Removes all the elements which are saved into the session.
+     * It fires on every application initialisation.
+     */
     emptySessionStorage() {
         if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
             sessionStorage.clear();

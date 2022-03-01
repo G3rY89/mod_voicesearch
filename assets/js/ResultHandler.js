@@ -1,3 +1,6 @@
+/**
+ * Class that handles the results on the company result page
+ */
 class ResultHandler{
 
     featuredResultList;
@@ -8,6 +11,10 @@ class ResultHandler{
         this.featuredResultList = this.getFeaturedResults();
     }
 
+    /**
+     * Iterates through the company result list
+     * @returns the first 3 results
+     */
     getFeaturedResults(){
         var that = this;
         var featuredResultList = [];
@@ -25,6 +32,10 @@ class ResultHandler{
         return featuredResultList;
     }
 
+    /**
+     * Iterates through the featured result lists companies
+     * @returns the name of the comapnies
+     */
     getFeaturedResultsCompanyNames(){
         var that = this;
 
@@ -44,6 +55,11 @@ class ResultHandler{
         return companyNames;
     }
 
+    /**
+     * Iterates through the company result container
+     * @param {*} nthResult 
+     * @returns the nth result of the company list
+     */
     getNthResult(nthResult){
         var that = this;
 

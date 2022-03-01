@@ -1,3 +1,6 @@
+/**
+ * Handles the popup messages of the enity
+ */
 class TooltipHandler {
 
     static tooltipContainer;
@@ -8,6 +11,10 @@ class TooltipHandler {
         this.tooltipText = jQuery(".tooltiptext1");
     }
 
+    /**
+     * Shows up the popup message with the given text
+     * @param {*} tooltiptext 
+     */
     showTooltipText(tooltiptext){
         this.tooltipContainer.css({
             'visibility' :'visible',
@@ -17,6 +24,9 @@ class TooltipHandler {
         this.tooltipText.text(tooltiptext);
     }
 
+    /**
+     * Hides the shown popup message
+     */
     hideTooltipText(){
         this.tooltipContainer.css({
             'visibility' :'hidden',

@@ -1,3 +1,6 @@
+/**
+ * This helper class creates connection between the Joomla engine and the module
+ */
 class JoomlaHelper {
 
     playbackHandler;
@@ -10,6 +13,11 @@ class JoomlaHelper {
         this.voiceRecorder = new VoiceRecorder();
     }
 
+    /**
+     * Get the language object from joomla database through the helper.php
+     * @param {*} lang 
+     * @returns the language object
+     */
     getLangFromDB(lang){
         return new Promise(function(resolve, reject){
             var request = jQuery.ajax({
@@ -23,6 +31,13 @@ class JoomlaHelper {
         })   
     }
  
+    /**
+     * Makes a request to the helper.php and gets the speech of the given text
+     * @param {*} reaction 
+     * @param {*} recognition 
+     * @param {*} TTS 
+     * @param {*} langObject 
+     */
     getTTS(reaction, recognition, TTS, langObject){
         var that = this;
 

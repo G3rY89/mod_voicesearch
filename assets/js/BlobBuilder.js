@@ -1,3 +1,6 @@
+/**
+ * A class which creates blob and vice versa to base64
+ */
 class BlobBuilder {
 
     parts = [];
@@ -7,6 +10,10 @@ class BlobBuilder {
 
     }
 
+    /**
+     * Appends a part of blob to a created blob array
+     * @param {*} part 
+     */
     append(part) {
         var that = this;
 
@@ -14,6 +21,10 @@ class BlobBuilder {
         that.blob = undefined; 
       };
 
+    /**
+     * Creates a blob object from blob array
+     * @returns new Blob
+     */
     getBlob() {
         var that = this;
 
@@ -23,6 +34,11 @@ class BlobBuilder {
         return that.blob;
     };
 
+    /**
+     * Converts blob to base64 string
+     * @param {*} blob 
+     * @returns new Promise
+     */
     blobToBase64(blob) {
         return new Promise((resolve, _) => {
             const reader = new FileReader();

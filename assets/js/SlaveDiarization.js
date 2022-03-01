@@ -1,3 +1,6 @@
+/**
+ * Secondary diarization which handles only the stopping of the entity
+ */
 class SlaveDiarization{
 
     recognition = new webkitSpeechRecognition();
@@ -10,6 +13,10 @@ class SlaveDiarization{
         this.recognition.maxAlternatives = 1;
     }
 
+    /**
+     * Starts the recognition. If it recognise the stopping keyword, the stops the recording as well the recognition
+     * @param {*} voiceRecorder 
+     */
     diarization(voiceRecorder){
         var that = this;
 

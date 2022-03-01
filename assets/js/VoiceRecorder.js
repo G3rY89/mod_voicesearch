@@ -1,24 +1,27 @@
+/**
+ * 
+ */
 class VoiceRecorder {
     mediaRecorder;
-    recordedBlobs = [];
-    sourceBuffer;
     blobBuilder;
 
     constructor(){
       this.blobBuilder = new BlobBuilder();    
     }
 
+    /**
+     * Creates a new Mediarecorder API with the given options and starts recording. 
+     * After 10s disposes it and starts a new 10s recording.
+     */
     startRecording() {
       var that = this;
 
-      var options = {mimeType: 'audio/webm'};
+      var options = {mimeType: 'audio/webm;codecs=pcm'};
 
       var constraints = {
         audio: true,
         video: false
       };
-
-      that.recordedBlobs = [];
 
       navigator.mediaDevices.getUserMedia(
         constraints
@@ -28,12 +31,12 @@ class VoiceRecorder {
         } catch (e0) {
           console.log('Unable to create MediaRecorder with options Object: ', e0);
           try {
-            options = {mimeType: 'audio/webm'};
+            options = {mimeType: 'audio/webm;codecs=pcm'};
             that.mediaRecorder = new MediaRecorder(stream, options);
           } catch (e1) {
             console.log('Unable to create MediaRecorder with options Object: ', e1);
             try {
-              options = 'audio/webm'; // Chrome 47
+              options = 'audio/webm;codecs=pcm'; // Chrome 47
               that.mediaRecorder = new MediaRecorder(stream, options);
             } catch (e2) {
               alert('MediaRecorder is not supported by this browser.\n\n' +
@@ -57,7 +60,7 @@ class VoiceRecorder {
             that.blobBuilder.append(event.data);
           }
         };
-        that.mediaRecorder.start(10000); // collect 10ms of data
+        that.mediaRecorder.start(10000); // collect 10s of data
         console.log('MediaRecorder started', that.mediaRecorder);
       },
         that.successCallback,
@@ -65,11 +68,18 @@ class VoiceRecorder {
       );
     }
     
+    /**
+     * Stops the actual recoring
+     */
     stopRecording() {
       var that = this;
       that.mediaRecorder.stop();
     }
 
+    /**
+     * Uploads the base64encoded voice sample
+     * @param {*} base64String 
+     */
     uploadFileForDiarization(base64String) {
 
       var base64AudioDto = 
