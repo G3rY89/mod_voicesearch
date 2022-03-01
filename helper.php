@@ -32,7 +32,7 @@ class ModVoiceSearchHelper
 
         $tts = new VoiceRSS;
         $voice = $tts->speech([
-            'key' => 'e94ea3d0dabd4a8c9b3b98fa1599b6dc',
+            'key' => '4fe3db9cda364051999f3903a58f3afc',
             'hl' =>$langobject["lang"] == "hu" ? 'hu-hu' : 'en-us',
             'v' => $langobject["tts_voice"],
             'src' => $TTS,
